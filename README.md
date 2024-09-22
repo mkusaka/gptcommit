@@ -21,13 +21,14 @@ See [announcement blog post](https://zura.wiki/post/never-write-a-commit-message
 1. Install this tool locally with `cargo` (recommended).
 
 ```sh
-cargo install --locked gptcommit
+cargo install --git https://github.com/mkusaka/gptcommit
+#cargo install --locked gptcommit
 ```
 
 or on macOS, use homebrew
 
 ```sh
-brew install zurawiki/brews/gptcommit
+#brew install zurawiki/brews/gptcommit
 ```
 
 2. In your `git` repository, run the following command to install `gptcommit` as a git prepare-commit-msg hook. You will need to provide an OpenAI API key to complete the installation.
