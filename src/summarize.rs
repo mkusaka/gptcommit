@@ -157,7 +157,7 @@ impl SummarizationClient {
 
         let prompt = format_prompt(
             &self.prompt_file_diff,
-            HashMap::from([("file_diff", file_diff)]),
+            HashMap::from([("file_diff", file_diff), ("commit_message", commit_message)]),
         )?;
 
         self.client.completions(&prompt).await
