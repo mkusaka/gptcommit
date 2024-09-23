@@ -159,6 +159,8 @@ impl SummarizationClient {
             &self.prompt_file_diff,
             HashMap::from([("file_diff", file_diff), ("commit_message", commit_message)]),
         )?;
+        
+        debug!("diff_summary prompt: {}", prompt);
 
         self.client.completions(&prompt).await
     }
@@ -187,6 +189,8 @@ impl SummarizationClient {
             HashMap::from([("summary_points", summary_points), ("commit_message", commit_message)]),
         )?;
 
+        debug!("commit_summary prompt: {}", prompt);
+
         self.client.completions(&prompt).await
     }
 
@@ -196,6 +200,8 @@ impl SummarizationClient {
             HashMap::from([("summary_points", summary_points), ("commit_message", commit_message)]),
         )?;
 
+        debug!("commit_title prompt: {}", prompt);
+        
         self.client.completions(&prompt).await
     }
 
