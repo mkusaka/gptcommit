@@ -116,23 +116,9 @@ pub(crate) async fn main(settings: Settings, args: PrepareCommitMsgArgs) -> Resu
     let file_diffs = output.split_prefix_inclusive("\ndiff --git ");
     let commit_message = summarization_client.get_commit_message(file_diffs, &original_message).await?;
 
-    // prepend output to commit message
-    let mut original_message: String = if args.commit_msg_file.is_file() {
-        fs::read_to_string(&args.commit_msg_file)?
-    } else {
-        String::new()
-    };
-    if settings.allow_amend.unwrap_or(false) {
-        original_message = original_message
-            .lines()
-            .map(|l| format!("# {l}"))
-            .collect::<Vec<String>>()
-            .join("\n");
-        original_message = format!("### BEGIN GIT COMMIT BEFORE AMEND\n{original_message}\n### END GIT COMMIT BEFORE AMEND\n");
-    }
     fs::write(
         &args.commit_msg_file,
-        format!("{commit_message}\n{original_message}"),
+        commit_message,
     )?;
 
     Ok(())
