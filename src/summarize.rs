@@ -154,6 +154,7 @@ impl SummarizationClient {
 
     async fn diff_summary(&self, file_name: &str, file_diff: &str, commit_message: &str) -> Result<String> {
         debug!("summarizing file: {}", file_name);
+        debug!("commit_message: {}", commit_message);
 
         let prompt = format_prompt(
             &self.prompt_file_diff,
@@ -184,6 +185,7 @@ impl SummarizationClient {
     }
 
     pub(crate) async fn commit_summary(&self, summary_points: &str, commit_message: &str) -> Result<String> {
+        debug!("commit_message: {}", commit_message);
         let prompt = format_prompt(
             &self.prompt_commit_summary,
             HashMap::from([("summary_points", summary_points), ("commit_message", commit_message)]),
@@ -195,6 +197,7 @@ impl SummarizationClient {
     }
 
     pub(crate) async fn commit_title(&self, summary_points: &str, commit_message: &str) -> Result<String> {
+        debug!("commit_message: {}", commit_message);
         let prompt = format_prompt(
             &self.prompt_commit_title,
             HashMap::from([("summary_points", summary_points), ("commit_message", commit_message)]),
