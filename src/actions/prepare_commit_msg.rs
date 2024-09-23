@@ -78,7 +78,7 @@ fn get_llm_client(settings: &Settings) -> Box<dyn LlmClient> {
 
 pub(crate) async fn main(settings: Settings, args: PrepareCommitMsgArgs) -> Result<()> {
     match (args.commit_source, settings.allow_amend) {
-        (CommitSource::Empty, _) | (CommitSource::Commit, Some(true)) => {}
+        (CommitSource::Empty, _) | (CommitSource::Commit, Some(true)) | (CommitSource::Message, _) => {}
         (CommitSource::Commit, _) => {
             println!("🤖 Skipping gptcommit since we're amending a commit. Change this behavior with `gptcommit config set allow_amend true`");
             return Ok(());
@@ -101,6 +101,12 @@ pub(crate) async fn main(settings: Settings, args: PrepareCommitMsgArgs) -> Resu
             .bold()
     );
 
+    let original_message: String = if args.commit_msg_file.is_file() {
+        fs::read_to_string(&args.commit_msg_file)?
+    } else {
+        String::new()
+    };
+
     let output = if let Some(git_diff_output) = args.git_diff_content {
         fs::read_to_string(git_diff_output)?
     } else {
@@ -108,7 +114,7 @@ pub(crate) async fn main(settings: Settings, args: PrepareCommitMsgArgs) -> Resu
     };
 
     let file_diffs = output.split_prefix_inclusive("\ndiff --git ");
-    let commit_message = summarization_client.get_commit_message(file_diffs).await?;
+    let commit_message = summarization_client.get_commit_message(file_diffs, &original_message).await?;
 
     // prepend output to commit message
     let mut original_message: String = if args.commit_msg_file.is_file() {

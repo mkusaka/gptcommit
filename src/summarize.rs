@@ -65,13 +65,14 @@ impl SummarizationClient {
         })
     }
 
-    pub(crate) async fn get_commit_message(&self, file_diffs: Vec<&str>) -> Result<String> {
+    pub(crate) async fn get_commit_message(&self, file_diffs: Vec<&str>, commit_message: &str) -> Result<String> {
         let mut set = JoinSet::new();
 
         for file_diff in file_diffs {
             let file_diff = file_diff.to_owned();
             let cloned_self = self.clone();
-            set.spawn(async move { cloned_self.process_file_diff(&file_diff).await });
+            let commit_message = commit_message.to_string();
+            set.spawn(async move { cloned_self.process_file_diff(&file_diff, &commit_message).await });
         }
 
         let mut summary_for_file: HashMap<String, String> = HashMap::with_capacity(set.len());
@@ -90,8 +91,8 @@ impl SummarizationClient {
         let mut message = String::with_capacity(1024);
 
         let (title, completion, conventional_commit_prefix) = try_join!(
-            self.commit_title(summary_points),
-            self.commit_summary(summary_points),
+            self.commit_title(summary_points, commit_message),
+            self.commit_summary(summary_points, commit_message),
             self.conventional_commit_prefix(summary_points)
         )?;
 
@@ -130,7 +131,7 @@ impl SummarizationClient {
     /// The function assumes that the file_diff input is well-formed
     /// according to the Diff format described in the Git documentation:
     /// https://git-scm.com/docs/git-diff
-    async fn process_file_diff(&self, file_diff: &str) -> Option<(String, String)> {
+    async fn process_file_diff(&self, file_diff: &str, commit_message: &str) -> Option<(String, String)> {
         if let Some(file_name) = util::get_file_name_from_diff(file_diff) {
             if self
                 .file_ignore
@@ -141,7 +142,7 @@ impl SummarizationClient {
 
                 return None;
             }
-            let completion = self.diff_summary(file_name, file_diff).await;
+            let completion = self.diff_summary(file_name, file_diff, commit_message).await;
             Some((
                 file_name.to_string(),
                 completion.unwrap_or_else(|_| "".to_string()),
@@ -151,7 +152,7 @@ impl SummarizationClient {
         }
     }
 
-    async fn diff_summary(&self, file_name: &str, file_diff: &str) -> Result<String> {
+    async fn diff_summary(&self, file_name: &str, file_diff: &str, commit_message: &str) -> Result<String> {
         debug!("summarizing file: {}", file_name);
 
         let prompt = format_prompt(
@@ -180,19 +181,19 @@ impl SummarizationClient {
         }
     }
 
-    pub(crate) async fn commit_summary(&self, summary_points: &str) -> Result<String> {
+    pub(crate) async fn commit_summary(&self, summary_points: &str, commit_message: &str) -> Result<String> {
         let prompt = format_prompt(
             &self.prompt_commit_summary,
-            HashMap::from([("summary_points", summary_points)]),
+            HashMap::from([("summary_points", summary_points), ("commit_message", commit_message)]),
         )?;
 
         self.client.completions(&prompt).await
     }
 
-    pub(crate) async fn commit_title(&self, summary_points: &str) -> Result<String> {
+    pub(crate) async fn commit_title(&self, summary_points: &str, commit_message: &str) -> Result<String> {
         let prompt = format_prompt(
             &self.prompt_commit_title,
-            HashMap::from([("summary_points", summary_points)]),
+            HashMap::from([("summary_points", summary_points), ("commit_message", commit_message)]),
         )?;
 
         self.client.completions(&prompt).await

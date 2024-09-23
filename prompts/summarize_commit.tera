@@ -14,4 +14,9 @@ THE FILE SUMMARIES:
 
 Remember to write only the most important points and do not write more than a few bullet points.
 
+{% if commit_message != "" %}
+Consider the following commit message for context:
+{{ commit_message }}
+{% endif %}
+
 THE COMMIT MESSAGE:

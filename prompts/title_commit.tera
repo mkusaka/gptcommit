@@ -20,5 +20,10 @@ THE FILE SUMMARIES:
 {{ summary_points }}
 ```
 
+{% if commit_message != "" %}
+Consider the following commit message for context:
+{{ commit_message }}
+{% endif %}
+
 Remember to write only one line, no more than 50 characters.
 THE COMMIT MESSAGE TITLE:
