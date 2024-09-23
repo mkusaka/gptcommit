@@ -39,11 +39,13 @@ because there were more than two relevant files in the hypothetical commit.
 Do not include parts of the example in your summary.
 It is given only as an example of appropriate comments.
 
+{% if commit_message %}
 CONSIDER THE FOLLOWING COMMIT MESSAGE FOR CONTEXT:
 
 ```
 {{ commit_message }}
 ```
+{% endif %}
 
 THE GIT DIFF TO BE SUMMARIZED:
 ```

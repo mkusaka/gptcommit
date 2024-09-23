@@ -7,11 +7,13 @@ Starting each bullet point with a `-`.
 Write a high level description. Do not repeat the commit summaries or the file summaries.
 Write the most important bullet points. The list should not be more than a few bullet points.
 
+{% if commit_message %}
 CONSIDER THE FOLLOWING COMMIT MESSAGE FOR CONTEXT:
 
 ```
 {{ commit_message }}
 ```
+{% endif %}
 
 THE FILE SUMMARIES:
 ```

@@ -15,11 +15,13 @@ Lower numeric tolerance for test files
 Schedule all GitHub actions on all OSs
 ```
 
+{% if commit_message %}
 CONSIDER THE FOLLOWING COMMIT MESSAGE FOR CONTEXT:
 
 ```
 {{ commit_message }}
 ```
+{% endif %}
 
 THE FILE SUMMARIES:
 ```
